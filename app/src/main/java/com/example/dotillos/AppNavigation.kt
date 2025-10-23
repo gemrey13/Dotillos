@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.dotillos.ui.screen.auth.LoginScreen
 import com.example.dotillos.ui.screen.auth.RegisterScreen
 import com.example.dotillos.ui.screen.patient.MyAppointmentScreen
+import com.example.dotillos.ui.screen.shared.NotificationScreen
 
 
 @Composable
@@ -61,6 +63,7 @@ fun AppNavigation() {
                         when (patientDestination) {
                             PatientDestinations.MyAppointment -> MyAppointmentScreen(Modifier.padding(innerPadding))
                             PatientDestinations.FAVORITES -> FavoritesScreen(Modifier.padding(innerPadding))
+                            PatientDestinations.NOTIFICATIONS -> NotificationScreen(Modifier.padding(innerPadding))
                             PatientDestinations.PROFILE -> ProfileScreen(Modifier.padding(innerPadding))
                         }
                     }
@@ -152,6 +155,7 @@ enum class AuthDestinations(val label: String) {
 enum class PatientDestinations(val label: String, val icon: ImageVector) {
     MyAppointment("MyAppointment", Icons.Default.Home),
     FAVORITES("Favorites", Icons.Default.Favorite),
+    NOTIFICATIONS("Notifications", Icons.Default.Notifications),
     PROFILE("Profile", Icons.Default.AccountBox)
 }
 
