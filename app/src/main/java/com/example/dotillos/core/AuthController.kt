@@ -4,6 +4,7 @@ import com.example.dotillos.models.RegisterResult
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.postgrest.from
 import kotlinx.serialization.json.buildJsonObject
 import org.slf4j.MDC.put
 import kotlin.time.ExperimentalTime
@@ -31,16 +32,22 @@ object AuthRepository {
         val signUpResponse = client.auth.signUpWith(Email) {
             this.email = email
             this.password = password
-            data = buildJsonObject {
-                put("name", name)
-                put("role", "Patient")
-            }
         }
 
-        if (signUpResponse != null && signUpResponse.emailConfirmedAt == null) {
+        val userId = signUpResponse?.id ?: return RegisterResult(success = false)
+
+        val profile = mapOf(
+            "id" to userId,
+            "name" to (name ?: "New User"),
+            "role" to "Patient",
+            "phone" to "",
+        )
+
+        client.from("profiles").insert(profile)
+
+        if (signUpResponse.emailConfirmedAt == null) {
             return RegisterResult(success = true, requiresVerification = true)
         }
-
         return RegisterResult(success = true)
 
     }

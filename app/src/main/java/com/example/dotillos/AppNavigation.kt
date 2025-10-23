@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.dotillos.core.SupabaseClientManager
+import com.example.dotillos.ui.screen.admin.UsersScreen
 import com.example.dotillos.ui.screen.auth.LoginScreen
 import com.example.dotillos.ui.screen.auth.RegisterScreen
 import com.example.dotillos.ui.screen.patient.MyAppointmentScreen
@@ -81,31 +82,31 @@ fun AppNavigation() {
                 )
             }
 
-//            "Admin" -> {
-//                var adminDestination by rememberSaveable { mutableStateOf(AdminDestinations.DASHBOARD) }
-//                NavigationSuiteScaffold(
-//                    navigationSuiteItems = {
-//                        AdminDestinations.entries.forEach { destination ->
-//                            item(
-//                                icon = { Icon(destination.icon, contentDescription = destination.label) },
-//                                label = { Text(destination.label) },
-//                                selected = destination == adminDestination,
-//                                onClick = { adminDestination = destination }
-//                            )
-//                        }
-//                    }
-//                ) {
-//                    Scaffold { innerPadding ->
-//                        when (adminDestination) {
+            "Admin" -> {
+                var adminDestination by rememberSaveable { mutableStateOf(AdminDestinations.USERS) }
+                NavigationSuiteScaffold(
+                    navigationSuiteItems = {
+                        AdminDestinations.entries.forEach { destination ->
+                            item(
+                                icon = { Icon(destination.icon, contentDescription = destination.label) },
+                                label = { Text(destination.label) },
+                                selected = destination == adminDestination,
+                                onClick = { adminDestination = destination }
+                            )
+                        }
+                    }
+                ) {
+                    Scaffold { innerPadding ->
+                        when (adminDestination) {
 //                            AdminDestinations.DASHBOARD -> AdminDashboardScreen(Modifier.padding(innerPadding))
-//                            AdminDestinations.USERS -> AdminUsersScreen(Modifier.padding(innerPadding))
+                            AdminDestinations.USERS -> UsersScreen(Modifier.padding(innerPadding))
 //                            AdminDestinations.SETTINGS -> AdminSettingsScreen(Modifier.padding(innerPadding))
 //                            AdminDestinations.REPORTS -> AdminReportsScreen(Modifier.padding(innerPadding))
 //                            AdminDestinations.LOGS -> AdminLogsScreen(Modifier.padding(innerPadding))
-//                        }
-//                    }
-//                }
-//            }
+                        }
+                    }
+                }
+            }
 //
 //            "Dentist" -> {
 //                var dentistDestination by rememberSaveable { mutableStateOf(DentistDestinations.SCHEDULE) }
