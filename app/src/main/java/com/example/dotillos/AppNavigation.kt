@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,8 +32,10 @@ import io.github.jan.supabase.auth.auth
 fun AppNavigation() {
     val session = remember { SupabaseClientManager.supabaseClient.auth.currentSessionOrNull() }
     var isUserLoggedIn by rememberSaveable { mutableStateOf(session != null) }
-
     var userRole by rememberSaveable { mutableStateOf("Patient") }
+
+
+
 
     if (!isUserLoggedIn) {
         var currentAuthDestination by rememberSaveable { mutableStateOf(AuthDestinations.LOGIN) }
@@ -169,13 +172,13 @@ enum class PatientDestinations(val label: String, val icon: ImageVector) {
 
 
 //
-//enum class AdminDestinations(val label: String, val icon: ImageVector) {
+enum class AdminDestinations(val label: String, val icon: ImageVector) {
 //    DASHBOARD("Dashboard", Icons.Default.Home),
-//    USERS("Users", Icons.Default.AccountBox),
+    USERS("Users", Icons.Default.AccountBox),
 //    SETTINGS("Settings", Icons.Default.Favorite),
 //    REPORTS("Reports", Icons.Default.Home),
 //    LOGS("Logs", Icons.Default.Favorite)
-//}
+}
 //
 //enum class DentistDestinations(val label: String, val icon: ImageVector) {
 //    SCHEDULE("Schedule", Icons.Default.Home),

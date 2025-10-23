@@ -27,12 +27,12 @@ object AuthRepository {
     }
 
     @OptIn(ExperimentalTime::class)
-    suspend fun register(email: String, password: String): RegisterResult {
+    suspend fun register(email: String, password: String, name: String? = null): RegisterResult {
         val signUpResponse = client.auth.signUpWith(Email) {
             this.email = email
             this.password = password
             data = buildJsonObject {
-                put("name", "John")
+                put("name", name)
                 put("role", "Patient")
             }
         }

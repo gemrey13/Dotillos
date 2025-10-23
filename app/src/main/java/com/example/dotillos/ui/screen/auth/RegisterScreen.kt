@@ -161,7 +161,7 @@ fun RegisterScreen(modifier: Modifier = Modifier, onNavigateToLogin: () -> Unit)
 
                             isLoading = true
 
-                            val result = AuthRepository.register(email, password)
+                            val result = AuthRepository.register(email, password, name)
 
                             isLoading = true
 
