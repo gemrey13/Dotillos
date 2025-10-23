@@ -56,6 +56,11 @@ object AuthRepository {
             throw e
         }
     }
+
+
+    suspend fun logout() {
+        client.auth.signOut()
+    }
 }
 
 

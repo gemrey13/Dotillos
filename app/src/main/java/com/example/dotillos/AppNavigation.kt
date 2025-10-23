@@ -70,7 +70,7 @@ fun AppNavigation() {
                                 PatientDestinations.MyAppointment -> MyAppointmentScreen(Modifier.padding(innerPadding))
                                 PatientDestinations.FAVORITES -> FavoritesScreen(Modifier.padding(innerPadding))
                                 PatientDestinations.NOTIFICATIONS -> NotificationScreen(Modifier.padding(innerPadding))
-                                PatientDestinations.PROFILE -> ProfileScreen(Modifier.padding(innerPadding))
+                                PatientDestinations.PROFILE -> ProfileScreen(Modifier.padding(innerPadding), onLogout = { isUserLoggedIn = false })
                             }
                         }
                     }

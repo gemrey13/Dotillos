@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,10 +29,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dotillos.core.AuthRepository
 import com.example.dotillos.ui.theme.AccentGray
 import com.example.dotillos.ui.theme.BackgroundWhite
 import com.example.dotillos.ui.theme.PrimaryBlue
 import com.example.dotillos.ui.theme.SecondaryGreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(modifier: Modifier = Modifier, onNavigateToLogin: () -> Unit) {
@@ -44,6 +47,8 @@ fun RegisterScreen(modifier: Modifier = Modifier, onNavigateToLogin: () -> Unit)
     val passwordPattern = Regex("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$")
     val emailPattern = Regex("^[A-Za-z].*@.+\\..+$")
     var registrationComplete by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     Surface(
         modifier
@@ -136,46 +141,45 @@ fun RegisterScreen(modifier: Modifier = Modifier, onNavigateToLogin: () -> Unit)
 
                 Button(
                     onClick = {
-//                        scope.launch {
-//                            errorMessage = null
+                        scope.launch {
+                            errorMessage = null
 
-//                            if (!emailPattern.matches(email)) {
-//                                Text(
-//                                    text = "Invalid email format",
-//                                    color = androidx.compose.ui.graphics.Color.Red
-//                                )
-//                            }
-//
-//                            if (!passwordPattern.matches(password)) {
-//                                errorMessage = "Password must be 8+ chars, include uppercase, number, and special char"
-//                                return@launch
-//                            }
-//
-//                            if (password != confirmPassword) {
-//                                errorMessage = "Passwords do not match"
-//                                return@launch
-//                            }
-//
-//                            isLoading = true
-//
-//                            val result = AuthRepository.register(email, password)
-//                            isLoading = false
-//
-//                            if (result.success) {
-//                                if (result.requiresVerification) {
-//                                    registrationComplete = true
-//                                }
-//                            } else {
-//                                errorMessage = result.errorMessage
-//                            }
-//
-//                        }
+                            if (!emailPattern.matches(email)) {
+                                errorMessage = "Invalid email format"
+                                return@launch
+                            }
+
+                            if (!passwordPattern.matches(password)) {
+                                errorMessage = "Password must be 8+ chars, include uppercase, number, and special char"
+                                return@launch
+                            }
+
+                            if (password != confirmPassword) {
+                                errorMessage = "Passwords do not match"
+                                return@launch
+                            }
+
+                            isLoading = true
+
+                            val result = AuthRepository.register(email, password)
+
+                            isLoading = true
+
+                            if (result.success) {
+                                if (result.requiresVerification) {
+                                    registrationComplete = true
+                                }
+                            } else {
+                                errorMessage = result.errorMessage
+                            }
+
+                        }
                     },
-                    enabled = !isLoading,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
+                    enabled = !isLoading,
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(if (isLoading) "Registering..." else "Register", color = BackgroundWhite, fontSize = 16.sp)
@@ -206,7 +210,7 @@ fun RegisterScreen(modifier: Modifier = Modifier, onNavigateToLogin: () -> Unit)
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
-                    onClick = { onNavigateToLogin },
+                    onClick = onNavigateToLogin,
                     modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {
                     Text("Back to Login", color = BackgroundWhite)
