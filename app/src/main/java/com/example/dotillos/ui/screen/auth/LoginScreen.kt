@@ -41,7 +41,7 @@ import com.example.dotillos.ui.theme.SecondaryGreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit) {
+fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit, loggedIn: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -112,6 +112,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit)
 
                         result.onSuccess {
                             Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
+                            loggedIn()
                         }.onFailure { throwable ->
                             val message = when {
                                 throwable.message?.contains("email_not_confirmed") == true ->

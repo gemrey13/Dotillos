@@ -41,7 +41,8 @@ fun AppNavigation() {
             when (currentAuthDestination) {
                 AuthDestinations.LOGIN -> LoginScreen(
                     modifier = Modifier.padding(innerPadding),
-                    onNavigateToRegister = { currentAuthDestination = AuthDestinations.REGISTER }
+                    onNavigateToRegister = { currentAuthDestination = AuthDestinations.REGISTER },
+                    loggedIn = { isUserLoggedIn = true }
                 )
                 AuthDestinations.REGISTER -> RegisterScreen(
                     modifier = Modifier.padding(innerPadding),
