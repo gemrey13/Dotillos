@@ -13,20 +13,25 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.dotillos.core.SupabaseClientManager
 import com.example.dotillos.ui.screen.auth.LoginScreen
 import com.example.dotillos.ui.screen.auth.RegisterScreen
 import com.example.dotillos.ui.screen.patient.MyAppointmentScreen
 import com.example.dotillos.ui.screen.common.NotificationScreen
 import com.example.dotillos.ui.screen.common.ProfileScreen
+import io.github.jan.supabase.auth.auth
 
 
 @Composable
 fun AppNavigation() {
-    var isUserLoggedIn by rememberSaveable { mutableStateOf(true) }
+    val session = remember { SupabaseClientManager.supabaseClient.auth.currentSessionOrNull() }
+    var isUserLoggedIn by rememberSaveable { mutableStateOf(session != null) }
+
     var userRole by rememberSaveable { mutableStateOf("Patient") }
 
     if (!isUserLoggedIn) {

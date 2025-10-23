@@ -1,5 +1,6 @@
 package com.example.dotillos.ui.screen.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,17 +24,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dotillos.core.AuthRepository
 import com.example.dotillos.ui.theme.AccentGray
 import com.example.dotillos.ui.theme.BackgroundWhite
 import com.example.dotillos.ui.theme.PrimaryBlue
 import com.example.dotillos.ui.theme.SecondaryGreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit) {
@@ -42,6 +47,8 @@ fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit)
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Surface(modifier
         .fillMaxSize()
@@ -98,31 +105,31 @@ fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit)
 
             Button(
                 onClick = {
-//                    scope.launch {
-//                        isLoading = true
-//                        val result = AuthRepository.login(email, password)
-//                        isLoading = false
-//
-//                        result.onSuccess {
-//
-//                        }.onFailure { throwable ->
-//                            val message = when {
-//                                throwable.message?.contains("email_not_confirmed") == true ->
-//                                    "Your email is not verified. Please check your inbox."
-//                                throwable.message?.contains("invalid_credentials") == true ->
-//                                    "Incorrect email or password."
-//                                else -> "Login failed: ${throwable.message}"
-//                            }
-//                            errorMessage = message
-//                        }
-//                    }
+                    scope.launch {
+                        isLoading = true
+                        val result = AuthRepository.login(email, password)
+                        isLoading = false
+
+                        result.onSuccess {
+                            Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
+                        }.onFailure { throwable ->
+                            val message = when {
+                                throwable.message?.contains("email_not_confirmed") == true ->
+                                    "Your email is not verified. Please check your inbox"
+                                throwable.message?.contains("invalid_credentials") == true ->
+                                    "Incorrect email or password"
+                                else -> "Login failed: ${throwable.message}"
+                            }
+                            errorMessage = message
+                        }
+                    }
                 },
-                enabled = !isLoading,
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                enabled = !isLoading,
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
             ) {
                 Text(if (isLoading) "Logging in..." else "Login", color = BackgroundWhite, fontSize = 16.sp)
             }
