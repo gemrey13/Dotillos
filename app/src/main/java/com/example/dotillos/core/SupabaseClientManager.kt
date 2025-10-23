@@ -6,6 +6,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.postgrest
 
+
 object SupabaseClientManager {
     private var client: SupabaseClient? = null
 
@@ -20,8 +21,8 @@ object SupabaseClientManager {
             ) {
                 install(Postgrest)
                 install(Auth)
+
             }
-//            println("Supabase Client Initialized.")
         }
     }
 

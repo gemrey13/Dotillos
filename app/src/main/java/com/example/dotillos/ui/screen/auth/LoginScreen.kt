@@ -1,5 +1,11 @@
 package com.example.dotillos.ui.screen.auth
 
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.credentials.*
+import androidx.compose.ui.platform.LocalContext
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.launch
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -11,34 +17,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.exceptions.GetCredentialException
 import com.example.dotillos.core.AuthRepository
+import com.example.dotillos.core.SupabaseClientManager
 import com.example.dotillos.ui.theme.AccentGray
 import com.example.dotillos.ui.theme.BackgroundWhite
 import com.example.dotillos.ui.theme.PrimaryBlue
 import com.example.dotillos.ui.theme.SecondaryGreen
-import kotlinx.coroutines.launch
+import com.google.android.libraries.identity.googleid.*
+import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.builtin.IDToken
+import io.github.jan.supabase.exceptions.RestException
+import java.security.MessageDigest
+import java.util.UUID
+
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit, loggedIn: () -> Unit) {
@@ -142,38 +140,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit,
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            OutlinedButton(
-                onClick = {
-//                    scope.launch {
-//                        try {
-//                            client.auth.signInWith(
-//                                Google,
-//                                redirectUrl = "smartdental://auth/callback"
-//                            )
-//                        } catch (e: Exception) {
-//                            e.printStackTrace()
-//                        }
-//                        isLoading = true
-//                        try {
-//                            AuthRepository.loginWithGoogle()
-//                        } catch (e: Exception) {
-//                            errorMessage = "Google login failed: ${e.message}"
-//                        } finally {
-//                            isLoading = false
-//                        }
-//                    }
-                },
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = PrimaryBlue,
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(width = 1.dp, color = AccentGray)
-            ) {
-                Text("Sign in with Google", fontSize = 14.sp)
-            }
+            GoogleSignInButton()
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -186,5 +153,73 @@ fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit,
             }
         }
     }
+}
 
+
+
+@Composable
+fun GoogleSignInButton() {
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val onClick: () -> Unit = {
+        val credentialManager = CredentialManager.create(context)
+
+        val rawNonce = UUID.randomUUID().toString()
+        val bytes = rawNonce.toByteArray()
+        val md = MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
+
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId("627700801003-tnpa8fmlfl4p5h9gvgh9qs2s2654h9ed.apps.googleusercontent.com")
+            .setNonce(hashedNonce)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        coroutineScope.launch {
+            try {
+                val result = credentialManager.getCredential(context, request)
+                val credential = result.credential
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                val googleIdToken = googleIdTokenCredential.idToken
+
+
+                SupabaseClientManager.supabaseClient.auth.signInWith(IDToken) {
+                    idToken = googleIdToken
+                    provider = Google
+                    nonce = rawNonce
+                }
+
+                Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+
+            } catch (e: GetCredentialException) {
+                Toast.makeText(context, "No credentials found: ${e.message}", Toast.LENGTH_SHORT).show()
+            } catch (e: GoogleIdTokenParsingException) {
+                Toast.makeText(context, "Invalid Google token: ${e.message}", Toast.LENGTH_SHORT).show()
+            } catch (e: RestException) {
+                Toast.makeText(context, "Supabase error: ${e.message}", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(context, "Unexpected error: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    OutlinedButton(
+        onClick = onClick,
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = PrimaryBlue,
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(width = 1.dp, color = AccentGray)
+    ) {
+        Text("Sign in with Google", fontSize = 14.sp)
+    }
 }

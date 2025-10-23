@@ -29,7 +29,6 @@ object AuthRepository {
 
     @OptIn(ExperimentalTime::class)
     suspend fun register(email: String, password: String): RegisterResult {
-        // Save the response to a variable
         val signUpResponse = client.auth.signUpWith(Email) {
             this.email = email
             this.password = password
@@ -45,16 +44,6 @@ object AuthRepository {
 
         return RegisterResult(success = true)
 
-    }
-
-
-    suspend fun loginWithGoogle() {
-        try {
-            client.auth.signInWith(Google, redirectUrl = "smartdental://auth/callback") {
-            }
-        } catch (e: Exception) {
-            throw e
-        }
     }
 
 

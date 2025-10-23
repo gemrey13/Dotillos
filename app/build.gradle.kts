@@ -64,10 +64,16 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
+
+    implementation("androidx.credentials:credentials:1.6.0-beta03")
+    implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("androidx.credentials:credentials-play-services-auth:1.6.0-beta03")
+
     implementation(platform("io.github.jan-tennert.supabase:bom:3.2.5"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.ktor:ktor-client-android:3.3.1")
-    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.2.5")
+
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
