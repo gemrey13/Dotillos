@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.dotillos.ui.screen.auth.LoginScreen
 import com.example.dotillos.ui.screen.auth.RegisterScreen
 import com.example.dotillos.ui.screen.patient.MyAppointmentScreen
-import com.example.dotillos.ui.screen.shared.NotificationScreen
+import com.example.dotillos.ui.screen.common.NotificationScreen
 
 
 @Composable
