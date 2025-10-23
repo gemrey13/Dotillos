@@ -18,11 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.dotillos.ui.screen.auth.LoginScreen
 import com.example.dotillos.ui.screen.auth.RegisterScreen
+import com.example.dotillos.ui.screen.patient.MyAppointmentScreen
 
 
 @Composable
 fun AppNavigation() {
-    var isUserLoggedIn by rememberSaveable { mutableStateOf(false) }
+    var isUserLoggedIn by rememberSaveable { mutableStateOf(true) }
     var userRole by rememberSaveable { mutableStateOf("Patient") }
 
     if (!isUserLoggedIn) {
@@ -44,13 +45,12 @@ fun AppNavigation() {
         when (userRole) {
 
             "Patient" -> {
-                var patientDestination by rememberSaveable { mutableStateOf(PatientDestinations.HOME) }
+                var patientDestination by rememberSaveable { mutableStateOf(PatientDestinations.MyAppointment) }
                 NavigationSuiteScaffold(
                     navigationSuiteItems = {
                         PatientDestinations.entries.forEach { destination ->
                             item(
                                 icon = { Icon(destination.icon, contentDescription = destination.label) },
-                                label = { Text(destination.label) },
                                 selected = destination == patientDestination,
                                 onClick = { patientDestination = destination }
                             )
@@ -59,7 +59,7 @@ fun AppNavigation() {
                 ) {
                     Scaffold { innerPadding ->
                         when (patientDestination) {
-                            PatientDestinations.HOME -> HomeScreen(Modifier.padding(innerPadding))
+                            PatientDestinations.MyAppointment -> MyAppointmentScreen(Modifier.padding(innerPadding))
                             PatientDestinations.FAVORITES -> FavoritesScreen(Modifier.padding(innerPadding))
                             PatientDestinations.PROFILE -> ProfileScreen(Modifier.padding(innerPadding))
                         }
@@ -150,7 +150,7 @@ enum class AuthDestinations(val label: String) {
 }
 
 enum class PatientDestinations(val label: String, val icon: ImageVector) {
-    HOME("Home", Icons.Default.Home),
+    MyAppointment("MyAppointment", Icons.Default.Home),
     FAVORITES("Favorites", Icons.Default.Favorite),
     PROFILE("Profile", Icons.Default.AccountBox)
 }
@@ -180,10 +180,7 @@ enum class PatientDestinations(val label: String, val icon: ImageVector) {
 
 
 
-@Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    Text("Your home here", modifier = modifier)
-}
+
 
 @Composable
 fun FavoritesScreen(modifier: Modifier = Modifier) {
