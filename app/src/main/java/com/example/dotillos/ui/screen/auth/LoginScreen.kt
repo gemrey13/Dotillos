@@ -141,7 +141,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit,
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            GoogleSignInButton()
+            GoogleSignInButton(loggedIn)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -159,7 +159,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onNavigateToRegister: () -> Unit,
 
 
 @Composable
-fun GoogleSignInButton() {
+fun GoogleSignInButton(loggedIn: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -197,6 +197,7 @@ fun GoogleSignInButton() {
                 }
 
                 Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+                loggedIn()
 
             } catch (e: GetCredentialException) {
                 Toast.makeText(context, "No credentials found: ${e.message}", Toast.LENGTH_SHORT).show()
