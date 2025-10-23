@@ -2,7 +2,6 @@ package com.example.dotillos.core
 
 import com.example.dotillos.models.RegisterResult
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.serialization.json.buildJsonObject

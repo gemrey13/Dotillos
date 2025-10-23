@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.exceptions.GetCredentialException
+import com.example.dotillos.R
 import com.example.dotillos.core.AuthRepository
 import com.example.dotillos.core.SupabaseClientManager
 import com.example.dotillos.ui.theme.AccentGray
@@ -173,7 +174,7 @@ fun GoogleSignInButton() {
 
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
-            .setServerClientId("627700801003-tnpa8fmlfl4p5h9gvgh9qs2s2654h9ed.apps.googleusercontent.com")
+            .setServerClientId(context.getString(R.string.googleClientID))
             .setNonce(hashedNonce)
             .build()
 
