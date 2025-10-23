@@ -21,6 +21,7 @@ import com.example.dotillos.ui.screen.auth.LoginScreen
 import com.example.dotillos.ui.screen.auth.RegisterScreen
 import com.example.dotillos.ui.screen.patient.MyAppointmentScreen
 import com.example.dotillos.ui.screen.common.NotificationScreen
+import com.example.dotillos.ui.screen.common.ProfileScreen
 
 
 @Composable
@@ -189,9 +190,4 @@ enum class PatientDestinations(val label: String, val icon: ImageVector) {
 @Composable
 fun FavoritesScreen(modifier: Modifier = Modifier) {
     Text("Your favorites here", modifier = modifier)
-}
-
-@Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
-    Text("Your profile here", modifier = modifier)
 }
