@@ -1,12 +1,12 @@
 package com.example.dotillos
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -58,17 +58,18 @@ fun AppNavigation() {
                                 onClick = { patientDestination = destination }
                             )
                         }
-                    }
-                ) {
-                    Scaffold { innerPadding ->
-                        when (patientDestination) {
-                            PatientDestinations.MyAppointment -> MyAppointmentScreen(Modifier.padding(innerPadding))
-                            PatientDestinations.FAVORITES -> FavoritesScreen(Modifier.padding(innerPadding))
-                            PatientDestinations.NOTIFICATIONS -> NotificationScreen(Modifier.padding(innerPadding))
-                            PatientDestinations.PROFILE -> ProfileScreen(Modifier.padding(innerPadding))
+                    },
+                    content = {
+                        Scaffold { innerPadding ->
+                            when (patientDestination) {
+                                PatientDestinations.MyAppointment -> MyAppointmentScreen(Modifier.padding(innerPadding))
+                                PatientDestinations.FAVORITES -> FavoritesScreen(Modifier.padding(innerPadding))
+                                PatientDestinations.NOTIFICATIONS -> NotificationScreen(Modifier.padding(innerPadding))
+                                PatientDestinations.PROFILE -> ProfileScreen(Modifier.padding(innerPadding))
+                            }
                         }
                     }
-                }
+                )
             }
 
 //            "Admin" -> {
