@@ -1,5 +1,8 @@
 package com.example.dotillos
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
@@ -7,6 +10,7 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -17,9 +21,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.dotillos.core.SupabaseClientManager
+import com.example.dotillos.repository.getFilteredProfiles
 import com.example.dotillos.ui.screen.admin.UsersScreen
 import com.example.dotillos.ui.screen.auth.LoginScreen
 import com.example.dotillos.ui.screen.auth.RegisterScreen
@@ -28,14 +34,52 @@ import com.example.dotillos.ui.screen.common.NotificationScreen
 import com.example.dotillos.ui.screen.common.ProfileScreen
 import io.github.jan.supabase.auth.auth
 
+suspend fun fetchUserRole(userId: String): String? {
+    return try {
+        val profiles = getFilteredProfiles(userId)
+        if (profiles.isEmpty()) {
+            Log.e("AppNavigation", "No profile found for userId: $userId")
+        }
+        profiles.firstOrNull()?.role
+    } catch (e: Exception) {
+        Log.e("AppNavigation", "Error fetching role: ${e.message}")
+        null
+    }
+}
+
 
 @Composable
 fun AppNavigation() {
-    val session = remember { SupabaseClientManager.supabaseClient.auth.currentSessionOrNull() }
+    val client = SupabaseClientManager.supabaseClient
+    val session = remember { client.auth.currentSessionOrNull() }
+
+    // Holds both login status and role loading state
     var isUserLoggedIn by rememberSaveable { mutableStateOf(session != null) }
-    var userRole by rememberSaveable { mutableStateOf("Patient") }
+    var userRole by rememberSaveable { mutableStateOf<String?>(null) }
+    var roleIsSet by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(isUserLoggedIn) {
+        val session = SupabaseClientManager.supabaseClient.auth.currentSessionOrNull()
+        if (session != null && isUserLoggedIn) {
+            roleIsSet = false
+            val role = fetchUserRole(session.user?.id ?: "")
+            if (role != null) {
+                userRole = role
+            } else {
+                Log.e("AppNavigation", "Fetched role is null")
+            }
+            roleIsSet = true
+        }
+    }
 
 
+
+    if (isUserLoggedIn && !roleIsSet) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
 
     if (!isUserLoggedIn) {
@@ -46,7 +90,8 @@ fun AppNavigation() {
                 AuthDestinations.LOGIN -> LoginScreen(
                     modifier = Modifier.padding(innerPadding),
                     onNavigateToRegister = { currentAuthDestination = AuthDestinations.REGISTER },
-                    loggedIn = { isUserLoggedIn = true }
+                    loggedIn = { isUserLoggedIn = true
+                        roleIsSet = true }
                 )
                 AuthDestinations.REGISTER -> RegisterScreen(
                     modifier = Modifier.padding(innerPadding),
@@ -75,7 +120,13 @@ fun AppNavigation() {
                                 PatientDestinations.MyAppointment -> MyAppointmentScreen(Modifier.padding(innerPadding))
                                 PatientDestinations.FAVORITES -> FavoritesScreen(Modifier.padding(innerPadding))
                                 PatientDestinations.NOTIFICATIONS -> NotificationScreen(Modifier.padding(innerPadding))
-                                PatientDestinations.PROFILE -> ProfileScreen(Modifier.padding(innerPadding), onLogout = { isUserLoggedIn = false })
+                                PatientDestinations.PROFILE -> ProfileScreen(
+                                    Modifier.padding(innerPadding),
+                                    onLogout = {
+                                        isUserLoggedIn = false
+                                        userRole = null
+                                        roleIsSet = false
+                                    })
                             }
                         }
                     }
@@ -100,6 +151,13 @@ fun AppNavigation() {
                         when (adminDestination) {
 //                            AdminDestinations.DASHBOARD -> AdminDashboardScreen(Modifier.padding(innerPadding))
                             AdminDestinations.USERS -> UsersScreen(Modifier.padding(innerPadding))
+                            AdminDestinations.PROFILE -> ProfileScreen(
+                                Modifier.padding(innerPadding),
+                                onLogout = {
+                                    isUserLoggedIn = false
+                                    userRole = null
+                                    roleIsSet = false
+                                })
 //                            AdminDestinations.SETTINGS -> AdminSettingsScreen(Modifier.padding(innerPadding))
 //                            AdminDestinations.REPORTS -> AdminReportsScreen(Modifier.padding(innerPadding))
 //                            AdminDestinations.LOGS -> AdminLogsScreen(Modifier.padding(innerPadding))
@@ -155,6 +213,10 @@ fun AppNavigation() {
 //                    }
 //                }
 //            }
+            else -> {
+                // fallback if role not recognized
+                Text("Unknown role: $userRole", modifier = Modifier.fillMaxSize())
+            }
         }
     }
 }
@@ -176,6 +238,8 @@ enum class PatientDestinations(val label: String, val icon: ImageVector) {
 enum class AdminDestinations(val label: String, val icon: ImageVector) {
 //    DASHBOARD("Dashboard", Icons.Default.Home),
     USERS("Users", Icons.Default.AccountBox),
+    PROFILE("Profile", Icons.Default.AccountBox)
+
 //    SETTINGS("Settings", Icons.Default.Favorite),
 //    REPORTS("Reports", Icons.Default.Home),
 //    LOGS("Logs", Icons.Default.Favorite)
@@ -193,8 +257,6 @@ enum class AdminDestinations(val label: String, val icon: ImageVector) {
 //    PROFILE("Profile", Icons.Default.AccountBox)
 //}
 //
-
-
 
 
 

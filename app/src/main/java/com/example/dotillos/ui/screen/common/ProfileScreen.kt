@@ -94,7 +94,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, onLogout: () -> Unit) {
             icon = Icons.AutoMirrored.Filled.ExitToApp,
             title = "Logout",
             color = Color.Red,
-            onLogout = onLogout
+            onLogout = onLogout,
         )
     }
 }
@@ -140,7 +140,11 @@ fun ProfileDetailCard(label: String, value: String, icon: androidx.compose.ui.gr
 }
 
 @Composable
-fun ProfileActionCard(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, color: Color, onLogout: () -> Unit = {}) {
+fun ProfileActionCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String, color: Color,
+    onLogout: () -> Unit = {},
+    ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
