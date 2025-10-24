@@ -27,6 +27,7 @@ import androidx.credentials.exceptions.GetCredentialException
 import com.example.dotillos.R
 import com.example.dotillos.core.AuthRepository
 import com.example.dotillos.core.SupabaseClientManager
+import com.example.dotillos.models.ProfileModel
 import com.example.dotillos.ui.theme.AccentGray
 import com.example.dotillos.ui.theme.BackgroundWhite
 import com.example.dotillos.ui.theme.PrimaryBlue
@@ -35,6 +36,7 @@ import com.google.android.libraries.identity.googleid.*
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.postgrest.from
 import java.security.MessageDigest
 import java.util.UUID
 
@@ -194,6 +196,17 @@ fun GoogleSignInButton(loggedIn: () -> Unit) {
                     idToken = googleIdToken
                     provider = Google
                     nonce = rawNonce
+                }
+
+                val session = SupabaseClientManager.supabaseClient.auth.currentSessionOrNull()
+                val userId = session?.user?.id
+                val rawName = session?.user?.userMetadata?.get("name")?.toString() ?: "New User"
+                val userName = rawName.trim('"')
+
+                val profile = ProfileModel(userId, userName, "Patient", "")
+
+                if (userId != null) {
+                    SupabaseClientManager.supabaseClient.from("profiles").insert(profile)
                 }
 
                 Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
